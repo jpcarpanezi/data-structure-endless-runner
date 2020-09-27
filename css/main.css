@@ -3,6 +3,44 @@ html, body{
 }
 
 canvas{
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
 	border:1px solid #d3d3d3;
-	background-color: #f1f1f1;
+/*	background-color: #f1f1f1;*/
+/*	background: rgb(93,179,221);*/
+/*	background: linear-gradient(0deg, rgba(93,179,221,1) 0%, rgba(34,43,119,1) 85%);*/
+	background: linear-gradient(181deg, #0075d2, #20409b, #07e7ff, #3668d3, #dd8e1e, #197ab1, #9100ff, #00f9ff, #c4829e, #407bec, #4eaccd, #030047, #eef2fd, #335d83, #f1b63e, #ea756a, #b9e8f2, #418697, #8100f1, #132e43);
+    background-size: 4000% 4000%;
+
+    -webkit-animation: AnimationName 600s ease infinite;
+    -moz-animation: AnimationName 600s ease infinite;
+    -o-animation: AnimationName 600s ease infinite;
+    animation: AnimationName 600s ease infinite;
+	
+}
+
+@-webkit-keyframes AnimationName {
+    0%{background-position:0% 4%}
+    50%{background-position:100% 97%}
+    100%{background-position:0% 4%}
+}
+
+@-moz-keyframes AnimationName {
+    0%{background-position:0% 4%}
+    50%{background-position:100% 97%}
+    100%{background-position:0% 4%}
+}
+
+@-o-keyframes AnimationName {
+    0%{background-position:0% 4%}
+    50%{background-position:100% 97%}
+    100%{background-position:0% 4%}
+}
+
+@keyframes AnimationName {
+    0%{background-position:0% 4%}
+    50%{background-position:100% 97%}
+    100%{background-position:0% 4%}
 }

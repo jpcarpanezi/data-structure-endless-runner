@@ -9,9 +9,11 @@ var obstacles = [];
 
 var jumpFX = document.getElementById('jumpfx');
 var gameoverFX = document.getElementById('gameoverfx');
+var backgroundFX = document.getElementById('backgroundfx');
 
 function startGame(){
 	gameArea.start();
+	backgroundFX.play();
 }
 
 function obstacle(){
@@ -78,6 +80,32 @@ var player = {
 	}
 }
 
+//var changeBackground = {
+//	updateBackground: function(){
+//		if(gameArea.score >= 0 && gameArea.score <= 9){
+//			gameArea.canvas.style.background = 'linear-gradient(0deg, rgba(120,154,181,1) 0%, rgba(32,64,155,1) 91%)';
+//		}else if(gameArea.score >= 10 && gameArea.score <= 19){
+//			gameArea.canvas.style.background = 'linear-gradient(0deg, rgba(253,252,77,1) 0%, rgba(54,104,211,1) 91%)';
+//		}else if(gameArea.score >= 20 && gameArea.score <= 29){
+//			gameArea.canvas.style.background = 'linear-gradient(0deg, rgba(221,142,30,1) 0%, rgba(25,122,177,1) 100%)';
+//		}else if(gameArea.score >= 30 && gameArea.score <= 39){
+//			gameArea.canvas.style.background = 'linear-gradient(0deg, rgba(145,0,255,1) 0%, rgba(0,249,255,1) 100%)';
+//		}else if(gameArea.score >= 40 && gameArea.score <= 49){
+//			gameArea.canvas.style.background = 'linear-gradient(0deg, rgba(196,130,158,1) 0%, rgba(64,123,236,1) 100%)';
+//		}else if(gameArea.score >= 50 && gameArea.score <= 59){
+//			gameArea.canvas.style.background = 'linear-gradient(0deg, rgba(78,172,205,1) 0%, rgba(3,0,71,1) 100%)';
+//		}else if(gameArea.score >= 60 && gameArea.score <= 69){
+//			gameArea.canvas.style.background = 'linear-gradient(0deg, rgba(238,242,253,1) 0%, rgba(51,93,131,1) 100%)';
+//		}else if(gameArea.score >= 70 && gameArea.score <= 79){
+//			gameArea.canvas.style.background = 'linear-gradient(0deg, rgba(241,182,62,1) 0%, rgba(234,117,106,1) 100%)';
+//		}else if(gameArea.score >= 80 && gameArea.score <= 89){
+//			gameArea.canvas.style.background = 'linear-gradient(0deg, rgba(185,232,242,1) 0%, rgba(65,134,151,1) 100%)';
+//		}else if(gameArea.score >= 90 && gameArea.score <= 99){
+//			gameArea.canvas.style.background = 'linear-gradient(0deg, rgba(129,0,241,1) 0%, rgba(19,46,67,1) 100%)';
+//		}
+//	}
+//}
+
 var gameArea = {
 	canvas: document.createElement('canvas'),
 	start: function(){
@@ -114,6 +142,7 @@ var gameArea = {
 		
 		player.newPos();
 		player.update();
+//		changeBackground.updateBackground();
 		gameArea.frame += 1;
 		gameArea.score += 0.01;
 		scoreText.update("Score: " + Math.floor(gameArea.score));
@@ -123,6 +152,7 @@ var gameArea = {
 	},
 	stop: function(){
 		clearInterval(this.interval);
+		backgroundFX.pause();
 		gameoverFX.play();
 	}
 }
