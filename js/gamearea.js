@@ -44,7 +44,7 @@ function fadeInAudio(audioID){
         if(sound.volume == 1){
             clearInterval(fadeAudio);
         }
-    }, 600);
+    }, 200);
 
 }
 
@@ -52,7 +52,6 @@ function resumeGame(){
 	obstacles.splice(0, 1);
 	gameArea.resume();
 	fadeInAudio('backgroundfx');
-	//setTimeout(() => backgroundFX.play(), 600);
 }
 
 function obstacle(){
@@ -60,9 +59,25 @@ function obstacle(){
 	this.width = Math.floor(minWidth + Math.random() * (maxWidth - minWidth + 1));
 	this.x = 1200;
 	this.y = gameArea.canvas.height - this.height;
+	this.adjusted = 0;
 	this.draw = function(){
 		gameArea.context.fillStyle = "green";
 		gameArea.context.fillRect(this.x, this.y, this.width, this.height);
+	}
+	this.adjust = function () {
+		for (var i = 0; i < potions.length; i++) {
+			if (this.x - potions[i].x - this.height / 4 < 30){//potions[i].x == this.x || potions[i].x < this.x && potions[i].x > this.x - this.width) {
+				this.x += potions[i].width + 20 + this.height / 4;
+				this.adjusted++;
+			}
+		}
+
+		for (var i = 0; i < shots.length; i++) {
+			if (this.x - shots[i].x - this.height / 4 < 30){
+				this.x += shots[i].width + 20 + this.height / 4;
+				this.adjusted++;
+			}
+		}
 	}
 }
 
@@ -72,15 +87,17 @@ function potion(){
 	this.x = 1200;
 	this.y = gameArea.canvas.height - this.height;
 	this.color = "red";
+	this.adjusted = false;
 	this.draw = function(){
 		gameArea.context.fillStyle = "red";
 		gameArea.context.fillRect(this.x, this.y, this.width, this.height);
 	}
 	this.adjust = function () {
 		for (var i = 0; i < obstacles.length; i++) {
-			if (obstacles[i].x == this.x || (obstacles[i].x < this.x && obstacles[i].x > this.x - this.width)) { // TODO: Melhorar detecção colisão
-				this.x += obstacles[i].width + 50;
-				this.y -= 10;
+			if (this.x - obstacles[i].x - obstacles[i].height / 4 < 30) {
+				this.x += obstacles[i].width + 20 + obstacles[i].height / 4;
+				this.adjusted = true;
+				break;
 			}
 		}
 	}
@@ -91,15 +108,17 @@ function shot(){
 	this.width = 10;
 	this.x = 1200;
 	this.y = gameArea.canvas.height - this.height;
+	this.adjusted = false;
 	this.draw = function(){
 		gameArea.context.fillStyle = "black";
 		gameArea.context.fillRect(this.x, this.y, this.width, this.height);
 	}
 	this.adjust = function () {
 		for (var i = 0; i < obstacles.length; i++) {
-			if (obstacles[i].x == this.x || (obstacles[i].x < this.x && obstacles[i].x > this.x - this.width)) { // TODO: Melhorar detecção colisão
-				this.x += obstacles[i].width + 50;
-				this.y -= 10;
+			if (this.x - obstacles[i].x - (obstacles[i].height) / 4 < 30) {
+				this.x += obstacles[i].width + 20 + obstacles[i].height / 4;
+				this.adjusted = true;
+				break;
 			}
 		}
 	}
@@ -282,6 +301,7 @@ var gameArea = {
 			obstacles.push(new obstacle());
 			gap = randGap();
 			gameArea.frame = 0;
+			obstacles[obstacles.length - 1].adjust();
 		}
 
 		
@@ -296,10 +316,15 @@ var gameArea = {
 			obstacles[i].draw();	
 		}
 
-		if (everyInterval(100)) {
+		if (Math.floor(gameArea.score * 100) % 220/*7100*/ == 0 && Math.floor(gameArea.score) != 0) {
 			potions.push(new potion());
 			potions[potions.length - 1].adjust();
 		}
+
+		// if (everyInterval(100)) {
+		// 	potions.push(new potion());
+		// 	potions[potions.length - 1].adjust();
+		// }
 		
 		for (var i = 0; i < potions.length; i++){
 			potions[i].x -= 1;
@@ -312,10 +337,15 @@ var gameArea = {
 			potions[i].draw();
 		}
 
-		if (everyInterval(109)){
+		if (Math.floor(gameArea.score * 100) % 210/*2300*/ == 0 && Math.floor(gameArea.score) != 0) {
 			shots.push(new shot());
 			shots[shots.length - 1].adjust();
 		}
+
+		// if (everyInterval(109)){
+		// 	shots.push(new shot());
+		// 	shots[shots.length - 1].adjust();
+		// }
 		
 		for (var i = 0; i < shots.length; i++){
 			shots[i].x -= 1;
