@@ -1,10 +1,10 @@
-minHeight = 20;
-maxHeight = 100;
-minWidth = 10;
-maxWidth = 20;
-minGap = 200;
-maxGap = 500;
-gap = randGap();
+var minHeight = 20;
+var maxHeight = 100;
+var minWidth = 10;
+var maxWidth = 20;
+var minGap = 200;
+var maxGap = 500;
+var gap = randGap();
 var obstacles = [];
 
 var jumpFX = document.getElementById('jumpfx');
@@ -43,9 +43,25 @@ function randGap(){
 	return Math.floor(minGap + Math.random() * (maxGap - minGap + 1));
 }
 
+function updateHighscore(){
+	if(gameArea.score > gameArea.highscore){
+		localStorage.setItem('highscore', Math.floor(gameArea.score));
+	}
+}
+
 var scoreText = {
-	x: 900,
+	x: 1000,
 	y: 50,
+	update: function(text){
+		gameArea.context.fillStyle = "black";
+		gameArea.context.font = "30px Consolas";
+		gameArea.context.fillText(text, this.x, this.y);
+	}
+}
+
+var highScoreText = {
+	x: 934,
+	y: 100,
 	update: function(text){
 		gameArea.context.fillStyle = "black";
 		gameArea.context.font = "30px Consolas";
@@ -80,32 +96,6 @@ var player = {
 	}
 }
 
-//var changeBackground = {
-//	updateBackground: function(){
-//		if(gameArea.score >= 0 && gameArea.score <= 9){
-//			gameArea.canvas.style.background = 'linear-gradient(0deg, rgba(120,154,181,1) 0%, rgba(32,64,155,1) 91%)';
-//		}else if(gameArea.score >= 10 && gameArea.score <= 19){
-//			gameArea.canvas.style.background = 'linear-gradient(0deg, rgba(253,252,77,1) 0%, rgba(54,104,211,1) 91%)';
-//		}else if(gameArea.score >= 20 && gameArea.score <= 29){
-//			gameArea.canvas.style.background = 'linear-gradient(0deg, rgba(221,142,30,1) 0%, rgba(25,122,177,1) 100%)';
-//		}else if(gameArea.score >= 30 && gameArea.score <= 39){
-//			gameArea.canvas.style.background = 'linear-gradient(0deg, rgba(145,0,255,1) 0%, rgba(0,249,255,1) 100%)';
-//		}else if(gameArea.score >= 40 && gameArea.score <= 49){
-//			gameArea.canvas.style.background = 'linear-gradient(0deg, rgba(196,130,158,1) 0%, rgba(64,123,236,1) 100%)';
-//		}else if(gameArea.score >= 50 && gameArea.score <= 59){
-//			gameArea.canvas.style.background = 'linear-gradient(0deg, rgba(78,172,205,1) 0%, rgba(3,0,71,1) 100%)';
-//		}else if(gameArea.score >= 60 && gameArea.score <= 69){
-//			gameArea.canvas.style.background = 'linear-gradient(0deg, rgba(238,242,253,1) 0%, rgba(51,93,131,1) 100%)';
-//		}else if(gameArea.score >= 70 && gameArea.score <= 79){
-//			gameArea.canvas.style.background = 'linear-gradient(0deg, rgba(241,182,62,1) 0%, rgba(234,117,106,1) 100%)';
-//		}else if(gameArea.score >= 80 && gameArea.score <= 89){
-//			gameArea.canvas.style.background = 'linear-gradient(0deg, rgba(185,232,242,1) 0%, rgba(65,134,151,1) 100%)';
-//		}else if(gameArea.score >= 90 && gameArea.score <= 99){
-//			gameArea.canvas.style.background = 'linear-gradient(0deg, rgba(129,0,241,1) 0%, rgba(19,46,67,1) 100%)';
-//		}
-//	}
-//}
-
 var gameArea = {
 	canvas: document.createElement('canvas'),
 	start: function(){
@@ -115,6 +105,11 @@ var gameArea = {
 		this.context = this.canvas.getContext('2d');
 		this.frame = 0;
 		this.score = 0;
+		if(localStorage.getItem('highscore') === null){
+			this.highscore = 0;
+		}else{
+			this.highscore = localStorage.getItem('highscore');
+		}
 		scoreText.update("Score: 0");
 		this.interval = setInterval(this.updateGameArea, 5);
 		window.addEventListener('keydown', jump);
@@ -142,16 +137,22 @@ var gameArea = {
 		
 		player.newPos();
 		player.update();
-//		changeBackground.updateBackground();
 		gameArea.frame += 1;
 		gameArea.score += 0.01;
 		scoreText.update("Score: " + Math.floor(gameArea.score));
+		
+		if(gameArea.highscore <= gameArea.score){
+			highScoreText.update("Highscore: " + Math.floor(gameArea.score));
+		}else{
+			highScoreText.update("Highscore: " + Math.floor(gameArea.highscore));
+		}
 	},
 	clear: function(){
 		gameArea.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
 	},
 	stop: function(){
 		clearInterval(this.interval);
+		updateHighscore();
 		backgroundFX.pause();
 		gameoverFX.play();
 	}
