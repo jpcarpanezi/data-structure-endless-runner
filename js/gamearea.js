@@ -22,10 +22,37 @@ function startGame(){
 	backgroundFX.play();
 }
 
+
+function fadeInAudio(audioID){
+    var sound = document.getElementById(audioID);
+	
+	sound.play();
+	sound.volume = 0;
+
+    var fadeAudio = setInterval(function(){
+        if(sound.volume < 1){
+			volume = sound.volume;
+			volume += 0.1;
+			
+            if(volume > 1){
+				volume = 1;
+			}
+			
+			sound.volume = volume;
+        }
+		
+        if(sound.volume == 1){
+            clearInterval(fadeAudio);
+        }
+    }, 600);
+
+}
+
 function resumeGame(){
 	obstacles.splice(0, 1);
 	gameArea.resume();
-	setTimeout(() => backgroundFX.play(), 600);
+	fadeInAudio('backgroundfx');
+	//setTimeout(() => backgroundFX.play(), 600);
 }
 
 function obstacle(){
@@ -344,7 +371,7 @@ var gameArea = {
 
 function restart(e){
 	let keyCode = e.keyCode;
-	console.log(keyCode);
+
 	if (keyCode == 32){
 		replay.clearText();
 		backgroundFX.currentTime = 0;
@@ -356,10 +383,10 @@ function restart(e){
 		myPotions = [];
 
 		window.removeEventListener("keydown", restart);
-	}
-	else if (keyCode == 80 && myPotions.length > 0) {
+	}else if (keyCode == 80 && myPotions.length > 0) {
 		myPotions.shift();
 		replay.clearText();
+		potionFX.currentTime = 0;
 		potionFX.play();
 		resumeGame();
 
