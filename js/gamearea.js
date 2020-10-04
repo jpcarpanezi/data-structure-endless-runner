@@ -15,10 +15,17 @@ var jumpFX = document.getElementById('jumpfx');
 var gameoverFX = document.getElementById('gameoverfx');
 var backgroundFX = document.getElementById('backgroundfx');
 var shootFX = document.getElementById('shootfx');
+var potionFX = document.getElementById('potionfx');
 
 function startGame(){
 	gameArea.start();
 	backgroundFX.play();
+}
+
+function resumeGame(){
+	obstacles.splice(0, 1);
+	gameArea.resume();
+	setTimeout(() => backgroundFX.play(), 600);
 }
 
 function obstacle(){
@@ -207,6 +214,10 @@ var gameArea = {
 		this.interval = setInterval(this.updateGameArea, 5);
 		window.addEventListener('keydown', playerAction);
 	},
+	resume: function(){
+		this.interval = setInterval(this.updateGameArea, 5);
+		window.addEventListener('keydown', playerAction);
+	},
 	updateGameArea: function(){
 		
 		for(i = 0; i<obstacles.length; i++){
@@ -333,6 +344,7 @@ var gameArea = {
 
 function restart(e){
 	let keyCode = e.keyCode;
+	console.log(keyCode);
 	if (keyCode == 32){
 		replay.clearText();
 		backgroundFX.currentTime = 0;
@@ -342,6 +354,14 @@ function restart(e){
 		shots = [];
 		myShots = [];
 		myPotions = [];
+
+		window.removeEventListener("keydown", restart);
+	}
+	else if (keyCode == 80 && myPotions.length > 0) {
+		myPotions.shift();
+		replay.clearText();
+		potionFX.play();
+		resumeGame();
 
 		window.removeEventListener("keydown", restart);
 	}
