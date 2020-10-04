@@ -72,8 +72,8 @@ var replay = {
 		gameArea.context.fillStyle = "black";
 		gameArea.context.font = "20px Consolas";
 		gameArea.context.textAlign = "center";
-		gameArea.context.fillText("Você morreu.", 600, 110);
-		gameArea.context.fillText("Pressione espaço para reiniciar.", 600, 140);
+		gameArea.context.fillText("Você morreu", 600, 235);
+		gameArea.context.fillText("Pressione espaço para reiniciar", 600, 265);
 	},
 	clearText: function(){
 		gameArea.context.fillText("", 500, 100);
