@@ -8,6 +8,8 @@ var gap = randGap();
 var obstacles = [];
 var potions = [];
 var shots = [];
+var myShots = [];
+var myPotions = [];
 
 var jumpFX = document.getElementById('jumpfx');
 var gameoverFX = document.getElementById('gameoverfx');
@@ -78,12 +80,15 @@ function everyInterval(n){
 
 function playerAction(e){
 	let keyCode = e.keyCode;
-	//console.log(keyCode);
+	
 	if(keyCode == 38){
 		player.speedY = -2;
 		jumpFX.play();
 	}else if(keyCode == 32){
-		shootFX.play();
+		if(myShots.length){
+			shootFX.play();
+			myShots.pop();
+		}
 	}
 }
 
@@ -108,19 +113,6 @@ var scoreText = {
 	}
 }
 
-var replay = {
-	insertText: function(){
-		gameArea.context.fillStyle = "black";
-		gameArea.context.font = "20px Consolas";
-		gameArea.context.textAlign = "center";
-		gameArea.context.fillText("Você morreu", 600, 235);
-		gameArea.context.fillText("Pressione espaço para reiniciar", 600, 265);
-	},
-	clearText: function(){
-		gameArea.context.fillText("", 500, 100);
-	}
-}
-
 var highScoreText = {
 	x: 934,
 	y: 100,
@@ -128,6 +120,45 @@ var highScoreText = {
 		gameArea.context.fillStyle = "black";
 		gameArea.context.font = "30px Consolas";
 		gameArea.context.fillText(text, this.x, this.y);
+	}
+}
+
+var shootText = {
+	x: 40,
+	y: 50,
+	update: function(text){
+		gameArea.context.fillStyle = "black";
+		gameArea.context.font = "30px Consolas";
+		gameArea.context.fillText(text, this.x, this.y);
+	}
+}
+
+var potionText = {
+	x: 40,
+	y: 100,
+	update: function(text){
+		gameArea.context.fillStyle = "black";
+		gameArea.context.font = "30px Consolas";
+		gameArea.context.fillText(text, this.x, this.y);
+	}
+}
+
+var replay = {
+	insertText: function(){
+		gameArea.context.fillStyle = "black";
+		gameArea.context.font = "20px Consolas";
+		gameArea.context.textAlign = "center";
+		if(myPotions.length > 0){
+			gameArea.context.fillText("Você morreu", 600, 225);
+			gameArea.context.fillText("Pressione espaço para reiniciar", 600, 255);
+			gameArea.context.fillText("ou pressione P para usar a poção de reviver", 600, 285);
+		}else{
+			gameArea.context.fillText("Você morreu", 600, 235);
+			gameArea.context.fillText("Pressione espaço para reiniciar", 600, 265);
+		}
+	},
+	clearText: function(){
+		gameArea.context.fillText("", 500, 100);
 	}
 }
 
@@ -177,6 +208,7 @@ var gameArea = {
 		window.addEventListener('keydown', playerAction);
 	},
 	updateGameArea: function(){
+		
 		for(i = 0; i<obstacles.length; i++){
 			if(player.crashWith(obstacles[i])){
 				gameArea.stop();
@@ -184,15 +216,23 @@ var gameArea = {
 			}
 		}
 
-		for (i = 0; i < potions.length; i++) {
-			if (player.crashWith(potions[i])) {
+		for(i = 0; i < potions.length; i++){
+			if(player.crashWith(potions[i])){
+				if(myPotions.length < 2){
+					myPotions.push(1);
+				}
+				
 				potions.splice(i, 1);
 				break;
 			}
 		}
 
-		for (i = 0; i < shots.length; i++) {
-			if (player.crashWith(shots[i])) {
+		for(i = 0; i < shots.length; i++){
+			if(player.crashWith(shots[i])){
+				if(myShots.length < 5){
+					myShots.push(1);
+				}
+				
 				shots.splice(i, 1);
 				break;
 			}
@@ -223,9 +263,9 @@ var gameArea = {
 			potions[potions.length - 1].adjust();
 		}
 		
-		for (var i = 0; i < potions.length; i++) {
+		for (var i = 0; i < potions.length; i++){
 			potions[i].x -= 1;
-			if (potions[i].x < 0 - potions[i].width) {
+			if (potions[i].x < 0 - potions[i].width){
 				potions.splice(i, 1);
 				i--;
 				continue;
@@ -239,9 +279,9 @@ var gameArea = {
 			shots[shots.length - 1].adjust();
 		}
 		
-		for (var i = 0; i < shots.length; i++) {
+		for (var i = 0; i < shots.length; i++){
 			shots[i].x -= 1;
-			if (shots[i].x < 0 - shots[i].width) {
+			if (shots[i].x < 0 - shots[i].width){
 				shots.splice(i, 1);
 				i--;
 				continue;
@@ -255,6 +295,20 @@ var gameArea = {
 		gameArea.frame += 1;
 		gameArea.score += 0.01;
 		scoreText.update("Score: " + Math.floor(gameArea.score));
+		
+		var shotDraw = "";
+		for(var i = 0; i < myShots.length; i++){
+			shotDraw += "●";
+		}
+		
+		shootText.update("Tiros: " + shotDraw);
+		
+		var potionDraw = "";
+		for(var i = 0; i < myPotions.length; i++){
+			potionDraw += "♥";
+		}
+		
+		potionText.update("Poção: " + potionDraw);
 		
 		if(gameArea.highscore <= gameArea.score){
 			highScoreText.update("Highscore: " + Math.floor(gameArea.score));
@@ -279,15 +333,16 @@ var gameArea = {
 
 function restart(e){
 	let keyCode = e.keyCode;
-	if (keyCode == 32) {
+	if (keyCode == 32){
 		replay.clearText();
 		backgroundFX.currentTime = 0;
 		startGame();
 		obstacles = [];
 		potions = [];
 		shots = [];
+		myShots = [];
+		myPotions = [];
 
 		window.removeEventListener("keydown", restart);
-
 	}
 }
