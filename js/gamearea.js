@@ -10,6 +10,7 @@ var obstacles = [];
 var jumpFX = document.getElementById('jumpfx');
 var gameoverFX = document.getElementById('gameoverfx');
 var backgroundFX = document.getElementById('backgroundfx');
+var shootFX = document.getElementById('shootfx');
 
 function startGame(){
 	gameArea.start();
@@ -34,9 +35,15 @@ function everyInterval(n){
 	return false;
 }
 
-function jump(){
-	player.speedY = -2;
-	jumpFX.play();
+function playerAction(e){
+	let keyCode = e.keyCode;
+	console.log(keyCode);
+	if(keyCode == 38){
+		player.speedY = -2;
+		jumpFX.play();
+	}else if(keyCode == 32){
+		shootFX.play();
+	}
 }
 
 function randGap(){
@@ -112,7 +119,7 @@ var gameArea = {
 		}
 		scoreText.update("Score: 0");
 		this.interval = setInterval(this.updateGameArea, 5);
-		window.addEventListener('keydown', jump);
+		window.addEventListener('keydown', playerAction);
 	},
 	updateGameArea: function(){
 		for(i = 0; i<obstacles.length; i++){
