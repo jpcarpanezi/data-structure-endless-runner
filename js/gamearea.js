@@ -62,7 +62,21 @@ var scoreText = {
 	update: function(text){
 		gameArea.context.fillStyle = "black";
 		gameArea.context.font = "30px Consolas";
+		gameArea.context.textAlign = "left";
 		gameArea.context.fillText(text, this.x, this.y);
+	}
+}
+
+var replay = {
+	insertText: function(){
+		gameArea.context.fillStyle = "black";
+		gameArea.context.font = "20px Consolas";
+		gameArea.context.textAlign = "center";
+		gameArea.context.fillText("Você morreu.", 600, 110);
+		gameArea.context.fillText("Pressione espaço para reiniciar.", 600, 140);
+	},
+	clearText: function(){
+		gameArea.context.fillText("", 500, 100);
 	}
 }
 
@@ -162,5 +176,21 @@ var gameArea = {
 		updateHighscore();
 		backgroundFX.pause();
 		gameoverFX.play();
+
+		replay.insertText();
+		window.removeEventListener("keydown", playerAction);
+		window.addEventListener("keydown", restart);
+	}
+}
+
+function restart(e){
+	let keyCode = e.keyCode;
+	if (keyCode == 32) {
+		replay.clearText();
+		backgroundFX.currentTime = 0;
+		startGame();
+		obstacles = [];
+
+		window.removeEventListener("keydown", restart);
 	}
 }
