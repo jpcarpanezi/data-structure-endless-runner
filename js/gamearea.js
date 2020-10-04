@@ -6,6 +6,8 @@ var minGap = 200;
 var maxGap = 500;
 var gap = randGap();
 var obstacles = [];
+var potions = [];
+var shots = [];
 
 var jumpFX = document.getElementById('jumpfx');
 var gameoverFX = document.getElementById('gameoverfx');
@@ -28,6 +30,45 @@ function obstacle(){
 	}
 }
 
+function potion(){
+	this.height = 10;
+	this.width = 10;
+	this.x = 1200;
+	this.y = gameArea.canvas.height - this.height;
+	this.color = "red";
+	this.draw = function(){
+		gameArea.context.fillStyle = "red";
+		gameArea.context.fillRect(this.x, this.y, this.width, this.height);
+	}
+	this.adjust = function () {
+		for (var i = 0; i < obstacles.length; i++) {
+			if (obstacles[i].x == this.x || (obstacles[i].x < this.x && obstacles[i].x > this.x - this.width)) { // TODO: Melhorar detecção colisão
+				this.x += obstacles[i].width + 50;
+				this.y -= 10;
+			}
+		}
+	}
+}
+
+function shot(){
+	this.height = 10;
+	this.width = 10;
+	this.x = 1200;
+	this.y = gameArea.canvas.height - this.height;
+	this.draw = function(){
+		gameArea.context.fillStyle = "black";
+		gameArea.context.fillRect(this.x, this.y, this.width, this.height);
+	}
+	this.adjust = function () {
+		for (var i = 0; i < obstacles.length; i++) {
+			if (obstacles[i].x == this.x || (obstacles[i].x < this.x && obstacles[i].x > this.x - this.width)) { // TODO: Melhorar detecção colisão
+				this.x += obstacles[i].width + 50;
+				this.y -= 10;
+			}
+		}
+	}
+}
+
 function everyInterval(n){
 	if(gameArea.frame % n == 0)
 		return true;
@@ -37,7 +78,7 @@ function everyInterval(n){
 
 function playerAction(e){
 	let keyCode = e.keyCode;
-	console.log(keyCode);
+	//console.log(keyCode);
 	if(keyCode == 38){
 		player.speedY = -2;
 		jumpFX.play();
@@ -142,6 +183,20 @@ var gameArea = {
 				return;
 			}
 		}
+
+		for (i = 0; i < potions.length; i++) {
+			if (player.crashWith(potions[i])) {
+				potions.splice(i, 1);
+				break;
+			}
+		}
+
+		for (i = 0; i < shots.length; i++) {
+			if (player.crashWith(shots[i])) {
+				shots.splice(i, 1);
+				break;
+			}
+		}
 		
 		gameArea.clear();
 		
@@ -150,10 +205,49 @@ var gameArea = {
 			gap = randGap();
 			gameArea.frame = 0;
 		}
+
 		
 		for(i=0; i<obstacles.length; i++){
 			obstacles[i].x -= 1;
+			if (obstacles[i].x < 0 - obstacles[i].width) {
+				obstacles.splice(i, 1);
+				i--;
+				continue;
+			}
+			
 			obstacles[i].draw();	
+		}
+
+		if (everyInterval(100)) {
+			potions.push(new potion());
+			potions[potions.length - 1].adjust();
+		}
+		
+		for (var i = 0; i < potions.length; i++) {
+			potions[i].x -= 1;
+			if (potions[i].x < 0 - potions[i].width) {
+				potions.splice(i, 1);
+				i--;
+				continue;
+			}
+			
+			potions[i].draw();
+		}
+
+		if (everyInterval(109)){
+			shots.push(new shot());
+			shots[shots.length - 1].adjust();
+		}
+		
+		for (var i = 0; i < shots.length; i++) {
+			shots[i].x -= 1;
+			if (shots[i].x < 0 - shots[i].width) {
+				shots.splice(i, 1);
+				i--;
+				continue;
+			}
+
+			shots[i].draw();
 		}
 		
 		player.newPos();
@@ -190,7 +284,10 @@ function restart(e){
 		backgroundFX.currentTime = 0;
 		startGame();
 		obstacles = [];
+		potions = [];
+		shots = [];
 
 		window.removeEventListener("keydown", restart);
+
 	}
 }
