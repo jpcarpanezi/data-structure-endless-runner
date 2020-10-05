@@ -1,5 +1,5 @@
 # Estrutura de Dados (ED Runner)
-Este repositório trata-se de um trabalho de **Estrutura de Dados(ESTC3)** do **Instituto Federal de Ciências e Tecnologia de São Paulo(IFSP) - Campus Piracicaba**. Este grupo composto pelos integrantes desenvolvedores Aldemir Humberto Soares Neto, Isabelle Caroline de Carvalho Costa, João Pedro Carpanezi dos Santos e Murilo Azevedo Jacon. O projeto consiste na aplicação de estruturas de Fila(First-In, First-Out), Lista(First-In, Last-Out) dentro de listas, a partir da criação de um jogo, proposta esta executada com um endless runner.
+Este repositório trata-se de um trabalho de **Estrutura de Dados(ESTC3)** do **Instituto Federal de Ciências e Tecnologia de São Paulo(IFSP) - Campus Piracicaba**. Este grupo composto pelos integrantes desenvolvedores Aldemir Humberto Soares Neto, Isabelle Caroline de Carvalho Costa, João Pedro Carpanezi dos Santos e Murilo Azevedo Jacon. O projeto consiste na aplicação de estruturas de Fila(First-In, First-Out), Lista(First-In, Last-Out) dentro de listas, aplicando estes conceitos na criação de um jogo com tematica de endless runner
 
 ## Instalação
 Para fazer a instalação, é necessário clonar o repositório em seu ambiente local, e executar o index.html em um navegador compatível com HTML5.
