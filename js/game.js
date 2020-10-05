@@ -1,3 +1,11 @@
+/**
+*	.push() adiciona um item a lista
+*	.shift() remove o primeiro elemento de uma lista (First-In, First-Out FILA)
+*	.pop() remove o ultimo elemento de uma lista (First-In, Last-Out PILHA)
+*	.splice() remove um indíce específico da lista
+*/
+
+// Variáveis de ambiente
 var minHeight = 20;
 var maxHeight = 100;
 var minWidth = 10;
