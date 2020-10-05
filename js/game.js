@@ -12,6 +12,7 @@ var myShots = [];
 var myPotions = [];
 var myShotsQueue = [];
 
+// Sons utilizados no jogo
 var jumpFX = document.getElementById('jumpfx');
 var gameoverFX = document.getElementById('gameoverfx');
 var backgroundFX = document.getElementById('backgroundfx');
@@ -21,7 +22,12 @@ var explosionFX = document.getElementById('explosionfx');
 var ammoReloadFX = document.getElementById('ammoreloadfx');
 var potionReloadFX = document.getElementById('potionreloadfx');
 
+/** 
+ * Função que inica o jogo
+ * É chamada ao clicar no botão "Start" ou ao reiniciar o jogo
+ */
 function startGame(){
+	// Verificação parar evitar que o jogo seja reiniciado caso o botão oculto seja clicado por estar em foco
 	if(gameArea.started == 0){
 		gameArea.start();
 		document.getElementsByTagName('canvas').focus;
@@ -31,6 +37,10 @@ function startGame(){
 	}
 }
 
+/** 
+ * Função utilizada para adicionar um efeito de FadeIn em um áudio
+ * @param {string} audioID ID do áudio a ser feito o FadeIn
+ */
 function fadeInAudio(audioID){
     var sound = document.getElementById(audioID);
 	
@@ -56,90 +66,134 @@ function fadeInAudio(audioID){
 
 }
 
+/**
+ * Resume o jogo caso o jogador morra e utilize uma poção
+ */
 function resumeGame(){
+	// Remove o obstáculo em que o jogador se encontra
 	obstacles.splice(0, 1);
+
 	gameArea.resume();
 	fadeInAudio('backgroundfx');
 }
 
+/**
+ * Classe do obstáculo
+ */
 function obstacle(){
+	// Gera aleatóriamente a altura do obstáculo
 	this.height = Math.floor(minHeight + Math.random() * (maxHeight - minHeight + 1));
+
+	// Gera aleatóriamente a largura do obstáculo
 	this.width = Math.floor(minWidth + Math.random() * (maxWidth - minWidth + 1));
 	this.x = 1200;
 	this.y = gameArea.canvas.height - this.height;
-	this.adjusted = 0;
+
+	/**
+	 * Desenha o obstáculo no canvas
+	 */
 	this.draw = function(){
 		gameArea.context.fillStyle = "green";
 		gameArea.context.fillRect(this.x, this.y, this.width, this.height);
 	}
+
+	/**
+	 * Ajusta a posição do obstáculo para caso exista uma poção ou o um tiro muito próximos
+	 */
 	this.adjust = function () {
 		for (var i = 0; i < potions.length; i++) {
 			if (this.x - potions[i].x - this.height / 4 < 30){
 				this.x += potions[i].width + 20 + this.height / 4;
-				this.adjusted++;
 			}
 		}
 
 		for (var i = 0; i < shots.length; i++) {
 			if (this.x - shots[i].x - this.height / 4 < 30){
 				this.x += shots[i].width + 20 + this.height / 4;
-				this.adjusted++;
 			}
 		}
 	}
 }
 
+/**
+ * Classe da poção
+ */
 function potion(){
 	this.height = 10;
 	this.width = 10;
 	this.x = 1200;
 	this.y = gameArea.canvas.height - this.height;
-	this.color = "red";
-	this.adjusted = false;
+
+	/**
+	 * Desenha a poção no canvas
+	 */
 	this.draw = function(){
 		gameArea.context.fillStyle = "red";
 		gameArea.context.fillRect(this.x, this.y, this.width, this.height);
 	}
+
+	/**
+	 * Ajusta a posição da poção caso exista um obstáculo muito próximo
+	 */
 	this.adjust = function () {
 		for (var i = 0; i < obstacles.length; i++) {
 			if (this.x - obstacles[i].x - obstacles[i].height / 4 < 30) {
 				this.x += obstacles[i].width + 20 + obstacles[i].height / 4;
-				this.adjusted = true;
 				break;
 			}
 		}
 	}
 }
 
+/**
+ * Classe do tiro
+ */
 function shot(){
 	this.height = 10;
 	this.width = 10;
 	this.x = 1200;
 	this.y = gameArea.canvas.height - this.height;
-	this.adjusted = false;
+
+	/**
+	 * Desenha o tiro no canvas
+	 */
 	this.draw = function(){
 		gameArea.context.fillStyle = "black";
 		gameArea.context.fillRect(this.x, this.y, this.width, this.height);
 	}
+
+	/**
+	 * Ajusta a posição do tiro caso exista um obstáculo muito próximo
+	 */
 	this.adjust = function () {
 		for (var i = 0; i < obstacles.length; i++) {
 			if (this.x - obstacles[i].x - (obstacles[i].height) / 4 < 30) {
 				this.x += obstacles[i].width + 20 + obstacles[i].height / 4;
-				this.adjusted = true;
 				break;
 			}
 		}
 	}
 }
 
+/**
+ * Classe para atirar os projéteis
+ */
 function shootProjectile(){
 	this.speedX = 0;
 	this.x = player.x;
 	this.y = player.y;
+
+	/**
+	 * Desenha o projétil no canvas
+	 */
 	this.draw = function(){
 		gameArea.context.fillStyle = "black";
 		gameArea.context.fillRect(this.x, this.y, 10, 10);
 	}
+
+	/**
+	 * Ajusta a posição do projétil
+	 */
 	this.newPos = function(){		
 		if(this.speedX < 1180){
 			this.speedX = 2;
@@ -152,6 +206,11 @@ function shootProjectile(){
 			myShotsQueue.shift();
 		}
 	}
+
+	/**
+	 * Verifica se o projétil atingiu um obstáculo
+	 * @param {obstacle} obs Obstáculo a se fazer a verificação
+	 */
 	this.crashWith = function(obs){
 		if(this.x + 30 > obs.x && this.x < obs.x + obs.width && this.y + 30 > obs.y)
 			return true;
@@ -160,6 +219,10 @@ function shootProjectile(){
 	}
 }
 
+/**
+ * Verifica se o frame atual está no intervalo de frames desejado
+ * @param {number} n Intervalo de frames a ser verificado
+ */
 function everyInterval(n){
 	if(gameArea.frame % n == 0)
 		return true;
@@ -167,15 +230,22 @@ function everyInterval(n){
 	return false;
 }
 
+/**
+ * Função chamada quando um evento "KeyDown" é detectado durante o jogo
+ * @param {KeyboardEvent} e Parâmetro enviado pelo navegador que indica o evento disparado
+ */
 function playerAction(e){
-	let keyCode = e.keyCode;
-	
-	if(keyCode == 38){
+	let keyCode = e.code;
+
+	// Verifica se a tecla pressionada foi a tecla "Seta para Cima"
+	if(keyCode === "ArrowUp"){
 		if(player.speedY == 0){
 			player.speedY = -2;
 			jumpFX.play();
 		}
-	}else if(keyCode == 32){
+	}
+	// Verifica se a tecla pressionada foi a tecla "Espaço"
+	else if(keyCode === "Space"){
 		if(myShots.length > 0){
 			shootFX.play();
 			myShotsQueue.push(myShots[myShots.length - 1]);
@@ -184,16 +254,25 @@ function playerAction(e){
 	}
 }
 
+/**
+ * Gera um intervalo aleatório entre obstáculos
+ */
 function randGap(){
 	return Math.floor(minGap + Math.random() * (maxGap - minGap + 1));
 }
 
+/**
+ * Atualiza o Highscore
+ */
 function updateHighscore(){
 	if(gameArea.score > gameArea.highscore){
 		localStorage.setItem('highscore', Math.floor(gameArea.score));
 	}
 }
 
+/**
+ * Texto que representa o score atual
+ */
 var scoreText = {
 	x: 1000,
 	y: 50,
@@ -205,6 +284,9 @@ var scoreText = {
 	}
 }
 
+/**
+ * Texto que representa o highscore
+ */
 var highScoreText = {
 	x: 934,
 	y: 100,
@@ -215,6 +297,9 @@ var highScoreText = {
 	}
 }
 
+/**
+ * Texto que representa o número de tiros disponíveis
+ */
 var shootText = {
 	x: 40,
 	y: 50,
@@ -225,6 +310,9 @@ var shootText = {
 	}
 }
 
+/**
+ * Texto que representa o número de poções disponíveis
+ */
 var potionText = {
 	x: 40,
 	y: 100,
@@ -235,6 +323,9 @@ var potionText = {
 	}
 }
 
+/**
+ * Texto que aparece quando o jogador morre
+ */
 var replay = {
 	insertText: function(){
 		gameArea.context.fillStyle = "black";
@@ -254,14 +345,25 @@ var replay = {
 	}
 }
 
+/**
+ * Objeto que guarda informações sobre o jogador
+ */
 var player = {
 	x: 20,
 	y: 470,
 	speedY: 0,
+
+	/**
+	 * Atualiza a posição do jogador no canvas
+	 */
 	update: function(){
 		gameArea.context.fillStyle = "black";
 		gameArea.context.fillRect(this.x, this.y, 30, 30);
 	},
+
+	/**
+	 * Calcula a nova posição do jogador com base na velocidade vertical
+	 */
 	newPos: function(){
 		if(this.y < 280){
 			this.speedY = 2;	
@@ -273,6 +375,11 @@ var player = {
 			this.speedY = 0;
 		}
 	},
+
+	/**
+	 * Verifica se o jogador colidiu com um objeto
+	 * @param {obstacle|potion|shot} obs Objeto a verificar a colisão
+	 */
 	crashWith: function(obs){
 		if(this.x + 30 > obs.x && this.x < obs.x + obs.width && this.y + 30 > obs.y)
 			return true;
@@ -281,9 +388,19 @@ var player = {
 	}
 }
 
+/**
+ * Objeto que guarda informações sobre a área de jogo
+ */
 var gameArea = {
+	// Variável de controle para caso o jogo tenha sido iniciado ou não
 	started: 0,
+
+	// Cria o canvas e guarda ele no começo do jogo
 	canvas: document.createElement('canvas'),
+
+	/**
+	 * Começa o jogo
+	 */
 	start: function(){
 		this.canvas.height = 500;
 		this.canvas.width = 1200;
@@ -291,21 +408,36 @@ var gameArea = {
 		this.context = this.canvas.getContext('2d');
 		this.frame = 0;
 		this.score = 0;
+
 		if(localStorage.getItem('highscore') === null){
 			this.highscore = 0;
 		}else{
 			this.highscore = localStorage.getItem('highscore');
 		}
+
 		scoreText.update("Score: 0");
+
+		// Faz com que a função updateGameArea seja chamada a cada 5ms
 		this.interval = setInterval(this.updateGameArea, 5);
+
+		// Adiciona um EventListener para quando uma tecla é pressionada
 		window.addEventListener('keydown', playerAction);
 	},
+
+	/**
+	 * Resume o jogo caso o jogador utilze uma poção
+	 */
 	resume: function(){
 		this.interval = setInterval(this.updateGameArea, 5);
 		window.addEventListener('keydown', playerAction);
 	},
+
+	/**
+	 * Atualiza a área de jogo
+	 */
 	updateGameArea: function(){
 		
+		// Verifica se o jogador colidiu com algum obstáculo e chama a função "stop" caso sim
 		for(i = 0; i<obstacles.length; i++){
 			if(player.crashWith(obstacles[i])){
 				gameArea.stop();
@@ -313,6 +445,7 @@ var gameArea = {
 			}
 		}
 
+		// Verifica se o jogador colidiu com uma poção e adiciona a poção na lista de poções e remove a poção do canvas
 		for(i = 0; i < potions.length; i++){
 			if(player.crashWith(potions[i])){
 				if(myPotions.length < 2){
@@ -329,6 +462,7 @@ var gameArea = {
 			}
 		}
 
+		// Verifica se o jogador colidiu com um tiro e adiciona o tiro na lista de tiros e remove o tiro do canvas
 		for(i = 0; i < shots.length; i++){
 			if(player.crashWith(shots[i])){
 				if(myShots.length < 5){
@@ -345,6 +479,7 @@ var gameArea = {
 			}
 		}
 		
+		// Verifica se um tiro colidiu com um obstáculo e remove o obstáculo do canvas
 		for(i = 0; i < myShotsQueue.length; i++){
 			for(j = 0; j < obstacles.length; j++){
 				if(myShotsQueue[i].crashWith(obstacles[j])){
@@ -360,8 +495,10 @@ var gameArea = {
 			}
 		}
 		
+		// Limpa o canvas
 		gameArea.clear();
 		
+		// Verifica se um obstáculo deve ser colocado na tela com base no parâmetro frame
 		if(everyInterval(gap)){
 			obstacles.push(new obstacle());
 			gap = randGap();
@@ -369,7 +506,7 @@ var gameArea = {
 			obstacles[obstacles.length - 1].adjust();
 		}
 
-		
+		// Desenha os obstáculos na tela
 		for(i=0; i<obstacles.length; i++){
 			obstacles[i].x -= 1;
 			if (obstacles[i].x < 0 - obstacles[i].width) {
@@ -381,12 +518,13 @@ var gameArea = {
 			obstacles[i].draw();	
 		}
 		
-		// Mudar de 7100 para 2020 para aumentar o spawn de poções
+		// Verifica se uma poção deve ser colocada na tela com base no score do jogador
 		if (Math.floor(gameArea.score * 100) % 7100 == 0 && Math.floor(gameArea.score) != 0) {
 			potions.push(new potion());
 			potions[potions.length - 1].adjust();
 		}
 		
+		// Desenha as poções na tela
 		for (var i = 0; i < potions.length; i++){
 			potions[i].x -= 1;
 			if (potions[i].x < 0 - potions[i].width){
@@ -398,12 +536,13 @@ var gameArea = {
 			potions[i].draw();
 		}
 
-		// Mudar 2300 para 210 para aumentar o spawn de tiros
+		// Verifica se um tiro deve ser colocado na tela com base no score do jogador
 		if (Math.floor(gameArea.score * 100) % 2300 == 0 && Math.floor(gameArea.score) != 0) {
 			shots.push(new shot());
 			shots[shots.length - 1].adjust();
 		}
 		
+		// Desenha os tiros na tela
 		for(var i = 0; i < shots.length; i++){
 			shots[i].x -= 1;
 			if (shots[i].x < 0 - shots[i].width){
@@ -415,38 +554,52 @@ var gameArea = {
 			shots[i].draw();
 		}
 		
+		// Atualiza a posição do player na tela
 		player.newPos();
 		player.update();
+
 		gameArea.frame += 1;
 		gameArea.score += 0.01;
 		scoreText.update("Score: " + Math.floor(gameArea.score));
 		
+		// Atualiza o highscore
 		if(gameArea.highscore <= gameArea.score){
 			highScoreText.update("Highscore: " + Math.floor(gameArea.score));
 		}else{
 			highScoreText.update("Highscore: " + Math.floor(gameArea.highscore));
 		}
 		
+		// Desenha os tiros que foram disparados na tela e calcula a nova posição deles
 		for(var i = 0; i < myShotsQueue.length; i++){
 			myShotsQueue[i].draw();
 			myShotsQueue[i].newPos();
 		}
 		
+		// Desenha a quantidade de tiros disponíveis na tela
 		var shotDraw = "";
 		for(var i = 0; i < myShots.length; i++){
 			shotDraw += "●";
 		}
 		shootText.update("Tiros: " + shotDraw);
 		
+		// Desenha a quantidade de poções disponíveis na tela
 		var potionDraw = "";
 		for(var i = 0; i < myPotions.length; i++){
 			potionDraw += "♥";
 		}
 		potionText.update("Poção: " + potionDraw);
 	},
+
+	/**
+	 * Limpa todo o canvas
+	 */
 	clear: function(){
 		gameArea.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
 	},
+
+	/**
+	 * Para o jogo quando o jogador morre
+	 */
 	stop: function(){
 		clearInterval(this.interval);
 		updateHighscore();
@@ -459,9 +612,15 @@ var gameArea = {
 	}
 }
 
+/**
+ * Função chamada quando um evento "KeyDown" é detectado após o jogador morrer
+ * @param {KeyboardEvent} e Parâmetro enviado pelo navegador que indica o evento disparado
+ */
 function restart(e){
-	let keyCode = e.keyCode;
-	if (keyCode == 32){
+	let keyCode = e.code;
+	
+	// Verifica se a tecla "Espaço" foi pressionada e reinicia o jogo
+	if (keyCode === "Space"){
 		gameArea.started = 0;
 		replay.clearText();
 		backgroundFX.currentTime = 0;
@@ -474,7 +633,9 @@ function restart(e){
 		myPotions = [];
 
 		window.removeEventListener("keydown", restart);
-	}else if (keyCode == 80 && myPotions.length > 0) {
+	}
+	// Verifica se a tecla "P" foi pressionada e continua o jogo caso o jogador possua poções
+	else if (keyCode === "KeyP" && myPotions.length > 0) {
 		myPotions.shift();
 		replay.clearText();
 		potionFX.currentTime = 0;
