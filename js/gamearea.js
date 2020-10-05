@@ -128,6 +128,34 @@ function shot(){
 	}
 }
 
+function shootProjectile(){
+	this.speedX = 0;
+	this.x = player.x;
+	this.y = player.y;
+	this.draw = function(){
+		gameArea.context.fillStyle = "black";
+		gameArea.context.fillRect(this.x, this.y, 10, 10);
+	}
+	this.newPos = function(){		
+		if(this.speedX < 1180){
+			this.speedX = 2;
+		}
+		
+		this.x = this.x + this.speedX;
+		
+		if(this.speedX == 2 && this.x == 1180){
+			this.speedX = 0;
+			myShotsQueue.shift();
+		}
+	}
+	this.crashWith = function(obs){
+		if(this.x + 30 > obs.x && this.x < obs.x + obs.width && this.y + 30 > obs.y)
+			return true;
+		
+		return false;
+	}
+}
+
 function everyInterval(n){
 	if(gameArea.frame % n == 0)
 		return true;
@@ -139,8 +167,10 @@ function playerAction(e){
 	let keyCode = e.keyCode;
 	
 	if(keyCode == 38){
-		player.speedY = -2;
-		jumpFX.play();
+		if(player.speedY == 0){
+			player.speedY = -2;
+			jumpFX.play();
+		}
 	}else if(keyCode == 32){
 		if(myShots.length > 0){
 			shootFX.play();
@@ -247,34 +277,6 @@ var player = {
 	}
 }
 
-function shootProjectile(){
-	this.speedX = 0;
-	this.x = player.x;
-	this.y = player.y;
-	this.draw = function(){
-		gameArea.context.fillStyle = "black";
-		gameArea.context.fillRect(this.x, this.y, 10, 10);
-	}
-	this.newPos = function(){		
-		if(this.speedX < 1180){
-			this.speedX = 2;
-		}
-		
-		this.x = this.x + this.speedX;
-		
-		if(this.speedX == 2 && this.x == 1180){
-			this.speedX = 0;
-			myShotsQueue.shift();
-		}
-	}
-	this.crashWith = function(obs){
-		if(this.x + 30 > obs.x && this.x < obs.x + obs.width && this.y + 30 > obs.y)
-			return true;
-		
-		return false;
-	}
-}
-
 var gameArea = {
 	canvas: document.createElement('canvas'),
 	start: function(){
@@ -373,16 +375,12 @@ var gameArea = {
 			
 			obstacles[i].draw();	
 		}
-
-		if (Math.floor(gameArea.score * 100) % 220/*7100*/ == 0 && Math.floor(gameArea.score) != 0) {
+		
+		// Mudar de 7100 para 2020 para aumentar o spawn de poções
+		if (Math.floor(gameArea.score * 100) % 7100 == 0 && Math.floor(gameArea.score) != 0) {
 			potions.push(new potion());
 			potions[potions.length - 1].adjust();
 		}
-
-		// if (everyInterval(100)) {
-		// 	potions.push(new potion());
-		// 	potions[potions.length - 1].adjust();
-		// }
 		
 		for (var i = 0; i < potions.length; i++){
 			potions[i].x -= 1;
@@ -395,15 +393,11 @@ var gameArea = {
 			potions[i].draw();
 		}
 
-		if (Math.floor(gameArea.score * 100) % 210/*2300*/ == 0 && Math.floor(gameArea.score) != 0) {
+		// Mudar 2300 para 210 para aumentar o spawn de tiros
+		if (Math.floor(gameArea.score * 100) % 2300 == 0 && Math.floor(gameArea.score) != 0) {
 			shots.push(new shot());
 			shots[shots.length - 1].adjust();
 		}
-
-		// if (everyInterval(109)){
-		// 	shots.push(new shot());
-		// 	shots[shots.length - 1].adjust();
-		// }
 		
 		for(var i = 0; i < shots.length; i++){
 			shots[i].x -= 1;
