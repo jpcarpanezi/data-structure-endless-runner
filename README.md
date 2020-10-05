@@ -8,7 +8,7 @@ git clone https://github.com/jpcarpanezi/data-structure-endless-runner.git
 ```
 
 ## Como Jogar
-Ao clicar em start o canvas será iniciado em sua tela, seu objetivo é, apertando a **seta para cima** desviar dos obstaculos e atingir a maior pontuação possível. Para ajuda-lo durante o percurso, você poderá coletar munições que ao apertar a **barra de espaço** permite que você atire contra os obstáculos para destruí-los. Você também poderá coletar algumas poções que ao morrer, permite que você aperte a **tecla P** para reviver e voltar do ponto onde parou, no entanto, tome cuidado, se clicar na barra de espaço o seu jogo será reiniciado e você irá perder todos os itens.
+Ao clicar em start o canvas será iniciado em sua tela, seu objetivo é, apertando a **seta para cima** desviar dos obstáculos e atingir a maior pontuação possível. Para ajuda-lo durante o percurso, você poderá coletar munições que ao apertar a **barra de espaço** permite que você atire contra os obstáculos para destruí-los. Você também poderá coletar algumas poções que ao morrer, permite que você aperte a **tecla P** para reviver e voltar do ponto onde parou, no entanto, tome cuidado, se clicar na barra de espaço o seu jogo será reiniciado e você irá perder todos os itens.
 
 ## Lista, fila e pilha
 Como proposta do projeto, o objetivo era a partir de um jogo, aplicar conceitos de estrutura de dados de fila, lista e pilha. Para manipulações das listas do JavaScript, utilizamos as funções .push() para inserir novos elementos, .shift() para remover o primeiro elemento de uma lista segundo conceito de FIFO, .pop() para remover o último elemento de uma lista para FILO e, .splice() para remover o elemento de um índice específico da lista.
