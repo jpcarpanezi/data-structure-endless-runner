@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<title>Endless Runner</title>
+	<title>ED Runner</title>
 	<meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 	
@@ -11,7 +11,62 @@
 </head>
 	
 <body id="game">
-	<button onclick="startGame()">Start</button>
+	<!-- Modal: How to Play -->
+	<div class="modal" id="howToPlay">
+		<div class="modal-content">
+			<span class="close" onclick="closeModal('howToPlay')">&times;</span>
+			<center><h2>Como Jogar</h2></center><hr>
+			<p>
+				<span><button class="button button-sm">▲</button>&nbsp;&nbsp;Seta para cima: Pula</span><br><br>
+				<span><button class="button button-sm">P</button>&nbsp;&nbsp;P: Usa poção (Se disponível)</span><br><br>
+				<span><button class="button button-sm">ESPAÇO</button>&nbsp;&nbsp;Espaço: Atira (Se disponível)</span>
+			</p>
+		</div>
+	</div>
+	
+	<!-- Modal: License -->
+	<div class="modal" id="license">
+		<div class="modal-content">
+			<span class="close" onclick="closeModal('license')">&times;</span>
+			<center><h2>Licença</h2></center><hr>
+			<p align="justify">
+				MIT License<br><br>
+
+				Copyright (c) 2020 Aldemir Humberto Soares Neto, Isabelle Caroline de Carvalho Costa, João Pedro Carpanezi dos Santos, Murilo Azevedo Jacon<br><br>
+				
+				Permission is hereby granted, free of charge, to any person obtaining a copy
+				of this software and associated documentation files (the "Software"), to deal
+				in the Software without restriction, including without limitation the rights
+				to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+				copies of the Software, and to permit persons to whom the Software is
+				furnished to do so, subject to the following conditions:<br><br>
+
+				The above copyright notice and this permission notice shall be included in all
+				copies or substantial portions of the Software.<br><br>
+
+				THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+				IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+				FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+				AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+				LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+				OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+				SOFTWARE.
+			</p><br>
+			
+			<center><h2>Copyrights</h2></center><hr>
+			<p>
+				Todos os efeitos sonoros utilizados no jogo são de uso livre e/ou sob condições de creditação para uso de terceiros, disponíveis em <a href="https://freesound.org/" target="_blank">FreeSound.org</a>. A trilha sonora <i>"[Vaporwave] - MACINTOSH PLUS - リサフランク420 / 現代のコンピュー"</i>, também disponível sob condição de atribuição de direitos, disponível em <a href="https://www.youtube.com/watch?v=_wcURnFRp9A&ab_channel=SyferMusic" target="_blank">YouTube.com</a>
+			</p>
+		</div>
+	</div>
+	
+	<div class="middle-page" id="initialButtons">
+		<button class="button button-lg" onclick="startGame()" id="startButton" style="margin-right: 5px;">Start</button>
+		<button class="button button-lg" onclick="openModal('howToPlay')" style="margin-right: 5px;">Como Jogar</button>
+		<a href="https://github.com/jpcarpanezi/data-structure-endless-runner" target="_blank"><button class="button button-lg" style="margin-right: 5px;">GitHub</button></a>
+		<button class="button button-lg" onclick="openModal('license')">Licenças</button>
+	</div>
+	
 	<audio src="assets/sounds/jump_fx.mp3" id="jumpfx"></audio>
 	<audio src="assets/sounds/gameover_fx.mp3" id="gameoverfx"></audio>
 	<audio src="assets/sounds/vaporwave.mp3" id="backgroundfx" loop></audio>
@@ -20,6 +75,8 @@
 	<audio src="assets/sounds/explosion_fx.mp3" id="explosionfx"></audio>
 	<audio src="assets/sounds/ammoReload_fx.mp3" id="ammoreloadfx"></audio>
 	<audio src="assets/sounds/potionReload_fx.mp3" id="potionreloadfx"></audio>
+	
 	<script type="text/javascript" src="js/gamearea.js"></script>
+	<script type="text/javascript" src="js/hud.js"></script>
 </body>
 </html>

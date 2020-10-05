@@ -22,10 +22,14 @@ var ammoReloadFX = document.getElementById('ammoreloadfx');
 var potionReloadFX = document.getElementById('potionreloadfx');
 
 function startGame(){
-	gameArea.start();
-	backgroundFX.play();
+	if(gameArea.started == 0){
+		gameArea.start();
+		document.getElementsByTagName('canvas').focus;
+		document.getElementById('startButton').parentNode.style.display = "none";
+		backgroundFX.play();
+		gameArea.started = 1;
+	}
 }
-
 
 function fadeInAudio(audioID){
     var sound = document.getElementById(audioID);
@@ -278,6 +282,7 @@ var player = {
 }
 
 var gameArea = {
+	started: 0,
 	canvas: document.createElement('canvas'),
 	start: function(){
 		this.canvas.height = 500;
@@ -456,8 +461,8 @@ var gameArea = {
 
 function restart(e){
 	let keyCode = e.keyCode;
-
 	if (keyCode == 32){
+		gameArea.started = 0;
 		replay.clearText();
 		backgroundFX.currentTime = 0;
 		startGame();
