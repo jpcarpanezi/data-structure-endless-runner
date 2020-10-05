@@ -10,12 +10,16 @@ var potions = [];
 var shots = [];
 var myShots = [];
 var myPotions = [];
+var myShotsQueue = [];
 
 var jumpFX = document.getElementById('jumpfx');
 var gameoverFX = document.getElementById('gameoverfx');
 var backgroundFX = document.getElementById('backgroundfx');
 var shootFX = document.getElementById('shootfx');
 var potionFX = document.getElementById('potionfx');
+var explosionFX = document.getElementById('explosionfx');
+var ammoReloadFX = document.getElementById('ammoreloadfx');
+var potionReloadFX = document.getElementById('potionreloadfx');
 
 function startGame(){
 	gameArea.start();
@@ -66,7 +70,7 @@ function obstacle(){
 	}
 	this.adjust = function () {
 		for (var i = 0; i < potions.length; i++) {
-			if (this.x - potions[i].x - this.height / 4 < 30){//potions[i].x == this.x || potions[i].x < this.x && potions[i].x > this.x - this.width) {
+			if (this.x - potions[i].x - this.height / 4 < 30){
 				this.x += potions[i].width + 20 + this.height / 4;
 				this.adjusted++;
 			}
@@ -138,8 +142,9 @@ function playerAction(e){
 		player.speedY = -2;
 		jumpFX.play();
 	}else if(keyCode == 32){
-		if(myShots.length){
+		if(myShots.length > 0){
 			shootFX.play();
+			myShotsQueue.push(myShots[myShots.length - 1]);
 			myShots.pop();
 		}
 	}
@@ -242,6 +247,34 @@ var player = {
 	}
 }
 
+function shootProjectile(){
+	this.speedX = 0;
+	this.x = player.x;
+	this.y = player.y;
+	this.draw = function(){
+		gameArea.context.fillStyle = "black";
+		gameArea.context.fillRect(this.x, this.y, 10, 10);
+	}
+	this.newPos = function(){		
+		if(this.speedX < 1180){
+			this.speedX = 2;
+		}
+		
+		this.x = this.x + this.speedX;
+		
+		if(this.speedX == 2 && this.x == 1180){
+			this.speedX = 0;
+			myShotsQueue.shift();
+		}
+	}
+	this.crashWith = function(obs){
+		if(this.x + 30 > obs.x && this.x < obs.x + obs.width && this.y + 30 > obs.y)
+			return true;
+		
+		return false;
+	}
+}
+
 var gameArea = {
 	canvas: document.createElement('canvas'),
 	start: function(){
@@ -276,7 +309,12 @@ var gameArea = {
 		for(i = 0; i < potions.length; i++){
 			if(player.crashWith(potions[i])){
 				if(myPotions.length < 2){
+					potionReloadFX.pause();
+					potionReloadFX.currentTime = 0;
+					
 					myPotions.push(1);
+					
+					potionReloadFX.play();
 				}
 				
 				potions.splice(i, 1);
@@ -287,11 +325,31 @@ var gameArea = {
 		for(i = 0; i < shots.length; i++){
 			if(player.crashWith(shots[i])){
 				if(myShots.length < 5){
-					myShots.push(1);
+					ammoReloadFX.pause();
+					ammoReloadFX.currentTime = 0;
+					
+					myShots.push(new shootProjectile());
+					
+					ammoReloadFX.play();
 				}
 				
 				shots.splice(i, 1);
 				break;
+			}
+		}
+		
+		for(i = 0; i < myShotsQueue.length; i++){
+			for(j = 0; j < obstacles.length; j++){
+				if(myShotsQueue[i].crashWith(obstacles[j])){
+					explosionFX.pause();
+					explosionFX.currentTime = 0;
+					
+					obstacles.splice(j, 1);
+					myShotsQueue.splice(i, 1);
+					
+					explosionFX.play();
+					break;
+				}
 			}
 		}
 		
@@ -347,7 +405,7 @@ var gameArea = {
 		// 	shots[shots.length - 1].adjust();
 		// }
 		
-		for (var i = 0; i < shots.length; i++){
+		for(var i = 0; i < shots.length; i++){
 			shots[i].x -= 1;
 			if (shots[i].x < 0 - shots[i].width){
 				shots.splice(i, 1);
@@ -364,25 +422,28 @@ var gameArea = {
 		gameArea.score += 0.01;
 		scoreText.update("Score: " + Math.floor(gameArea.score));
 		
+		if(gameArea.highscore <= gameArea.score){
+			highScoreText.update("Highscore: " + Math.floor(gameArea.score));
+		}else{
+			highScoreText.update("Highscore: " + Math.floor(gameArea.highscore));
+		}
+		
+		for(var i = 0; i < myShotsQueue.length; i++){
+			myShotsQueue[i].draw();
+			myShotsQueue[i].newPos();
+		}
+		
 		var shotDraw = "";
 		for(var i = 0; i < myShots.length; i++){
 			shotDraw += "●";
 		}
-		
 		shootText.update("Tiros: " + shotDraw);
 		
 		var potionDraw = "";
 		for(var i = 0; i < myPotions.length; i++){
 			potionDraw += "♥";
 		}
-		
 		potionText.update("Poção: " + potionDraw);
-		
-		if(gameArea.highscore <= gameArea.score){
-			highScoreText.update("Highscore: " + Math.floor(gameArea.score));
-		}else{
-			highScoreText.update("Highscore: " + Math.floor(gameArea.highscore));
-		}
 	},
 	clear: function(){
 		gameArea.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
@@ -410,6 +471,7 @@ function restart(e){
 		potions = [];
 		shots = [];
 		myShots = [];
+		myShotsQueue = [];
 		myPotions = [];
 
 		window.removeEventListener("keydown", restart);
